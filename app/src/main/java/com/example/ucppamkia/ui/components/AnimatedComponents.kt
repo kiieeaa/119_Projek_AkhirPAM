@@ -1,20 +1,26 @@
 package com.example.ucppamkia.ui.components
 
+import AzureBlue
 import BlueAccent
 import BlueLight
 import BluePrimary
+import ElectricBlue
 import GlassWhite
 import GradientMintEnd
 import GradientMintStart
+import NeonBlue
+import TurquoiseBlue
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
@@ -29,44 +35,9 @@ import com.example.ucppamkia.ui.theme.*
 import kotlinx.coroutines.launch
 import kotlin.math.sin
 
-/**
- * Animated Gradient Background
- * Creates a smooth animated gradient background
- */
-@Composable
-fun AnimatedGradientBackground(
-    colors: List<Color>,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    val infiniteTransition = rememberInfiniteTransition(label = "gradient")
-    val offsetX by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1000f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(3000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "offsetX"
-    )
-    
-    Box(
-        modifier = modifier.background(
-            brush = Brush.linearGradient(
-                colors = colors,
-                start = Offset(offsetX, offsetX),
-                end = Offset(offsetX + 1000f, offsetX + 1000f)
-            )
-        )
-    ) {
-        content()
-    }
-}
 
-/**
- * Glassmorphic Card
- * Card with blur effect and semi-transparency
- */
+
+//Membuat card transparan bergaya glassmorphism
 @Composable
 fun GlassmorphicCard(
     modifier: Modifier = Modifier,
@@ -88,10 +59,7 @@ fun GlassmorphicCard(
     }
 }
 
-/**
- * Gradient Button
- * Button with animated gradient background and proper layout
- */
+//Membuat tombol dengan warna gradasi dan animasi
 @Composable
 fun GradientButton(
     onClick: () -> Unit,
@@ -171,10 +139,7 @@ fun GradientButton(
     }
 }
 
-/**
- * Pulsing FAB
- * Floating Action Button with continuous pulse animation
- */
+//Membuat tombol floating dengan efek denyut
 @Composable
 fun PulsingFAB(
     onClick: () -> Unit,
@@ -211,10 +176,7 @@ fun PulsingFAB(
     }
 }
 
-/**
- * Shimmer Text
- * Text with shimmer animation effect
- */
+//Membuat teks dengan efek berkilau
 @Composable
 fun ShimmerText(
     text: String,
@@ -240,10 +202,7 @@ fun ShimmerText(
     )
 }
 
-/**
- * Animated Card with Slide-in Effect
- * Card that slides in from the side with a delay
- */
+//Membuat card dengan animasi muncul geser
 @Composable
 fun AnimatedCard(
     modifier: Modifier = Modifier,
@@ -281,70 +240,62 @@ fun AnimatedCard(
     }
 }
 
-/**
- * Gradient Progress Indicator
- * Linear progress indicator with gradient colors
- */
-@Composable
-fun GradientProgressIndicator(
-    progress: Float,
-    modifier: Modifier = Modifier,
-    gradientColors: List<Color> = listOf(GradientMintStart, GradientMintEnd)
-) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(8.dp)
-            .clip(RoundedCornerShape(4.dp))
-            .background(BlueLight)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(progress)
-                .fillMaxHeight()
-                .background(
-                    brush = Brush.horizontalGradient(gradientColors)
-                )
-        )
-    }
-}
 
-/**
- * Floating Particles Background
- * Animated particles for background decoration
- */
+
+//Membuat animasi lingkaran sebagai dekorasi background
 @Composable
-fun FloatingParticles(
-    particleCount: Int = 20,
-    modifier: Modifier = Modifier
+fun FloatingCircles(
+    modifier: Modifier = Modifier,
+    circleCount: Int = 8,
+    colors: List<Color> = listOf(ElectricBlue, NeonBlue, AzureBlue, TurquoiseBlue)
 ) {
-    // Simple implementation - can be enhanced with Canvas
     Box(modifier = modifier) {
-        repeat(particleCount) { index ->
-            val infiniteTransition = rememberInfiniteTransition(label = "particle$index")
+        repeat(circleCount) { index ->
+            val infiniteTransition = rememberInfiniteTransition(label = "circle$index")
+
             val offsetY by infiniteTransition.animateFloat(
-                initialValue = 0f,
+                initialValue = -100f,
                 targetValue = 100f,
                 animationSpec = infiniteRepeatable(
                     animation = tween(
-                        durationMillis = 3000 + (index * 200),
+                        durationMillis = 4000 + (index * 500),
                         easing = LinearEasing
                     ),
                     repeatMode = RepeatMode.Reverse
                 ),
                 label = "offsetY$index"
             )
-            
+
+            val scale by infiniteTransition.animateFloat(
+                initialValue = 0.8f,
+                targetValue = 1.2f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(
+                        durationMillis = 3000 + (index * 300),
+                        easing = FastOutSlowInEasing
+                    ),
+                    repeatMode = RepeatMode.Reverse
+                ),
+                label = "scale$index"
+            )
+
             Box(
                 modifier = Modifier
                     .offset(
-                        x = (index * 50 % 300).dp,
+                        x = ((index * 80) % 350).dp,
                         y = offsetY.dp
                     )
-                    .size(4.dp)
+                    .size((60 + index * 20).dp)
+                    .scale(scale)
+                    .alpha(0.15f)
                     .background(
-                        color = Color.White.copy(alpha = 0.3f),
-                        shape = RoundedCornerShape(2.dp)
+                        brush = Brush.radialGradient(
+                            colors = listOf(
+                                colors[index % colors.size],
+                                Color.Transparent
+                            )
+                        ),
+                        shape = CircleShape
                     )
             )
         }
