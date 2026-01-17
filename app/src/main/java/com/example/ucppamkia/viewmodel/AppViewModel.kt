@@ -103,12 +103,29 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         rute: String
     ): List<DetailTiket> {
         return list.filter { item ->
+            // 1. Ambil tanggal string
+            val tanggalStr = item.tiket.tanggalPendakian
 
-            // Mengecek apakah bulan sesuai.
-            val matchBulan =
-                if (bulan.isEmpty()) true
-                else item.tiket.tanggalPendakian.split("/")
-                    .getOrElse(1) { "" } == bulan
+            // 2. Tentukan bulan dari database (Logika lebih fleksibel)
+            // Kita split berdasarkan "/" ATAU "-"
+            val parts = tanggalStr.split("/", "-")
+
+            val bulanDiDb = when {
+                // Jika format YYYY-MM-DD atau YYYY/MM/DD (Bulan di tengah/index 1)
+                parts.size == 3 && parts[0].length == 4 -> parts[1]
+                // Jika format DD-MM-YYYY atau DD/MM/YYYY (Bulan di tengah/index 1)
+                parts.size == 3 -> parts[1]
+                // Default jika gagal parsing
+                else -> ""
+            }
+
+            // 3. Bandingkan (Handle kasus "1" vs "01" dengan toInt jika memungkinkan)
+            val matchBulan = if (bulan.isEmpty()) true else {
+                // Ubah keduanya ke Int agar "01" sama dengan "1"
+                val inputBulanInt = bulan.toIntOrNull()
+                val dbBulanInt = bulanDiDb.toIntOrNull()
+                inputBulanInt != null && inputBulanInt == dbBulanInt
+            }
 
             // Mengecek apakah rute sesuai.
             val matchRute =
